@@ -14,5 +14,5 @@ if [ $# -ge 1 ]; then
    echo "----------"
    echo "-m "$1
    echo $1
-   git -C $DEST commit --dry-run -av "-m "$1
+   git -C $DEST commit '--dry-run -av -m '$1
 fi

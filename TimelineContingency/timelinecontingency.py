@@ -1,6 +1,15 @@
 print(' ')
 print('---------------------------------------')
 print('Hello world from timelinecontingency.py')
+'''
+from inspect import currentframe, getframeinfo
+
+def TRACE():
+    frameinfo = getframeinfo(currentframe())
+    print(frameinfo.filename, frameinfo.lineno)
+
+TRACE()
+'''
 
 """Reports/Text Reports/Family Sheet"""
 
@@ -10,11 +19,10 @@ print('Hello world from timelinecontingency.py')
 # python modules
 #
 #------------------------------------------------------------------------
-#from functools import partial
+from functools import partial
 #import html
 
 import string
-
 #------------------------------------------------------------------------
 #
 # Set up logging
@@ -29,6 +37,10 @@ import string
 # Gramps module
 #
 #------------------------------------------------------------------------
+from gramps.gen.plug.docgen import (IndexMark, FontStyle, ParagraphStyle,
+                                    TableStyle, TableCellStyle,
+                                    FONT_SANS_SERIF, INDEX_TYPE_TOC,
+                                    PARA_ALIGN_CENTER, PARA_ALIGN_RIGHT)
 
 from gramps.gen.display.name import displayer
 from gramps.gen.display.place import displayer as place_displayer
@@ -49,8 +61,6 @@ except ValueError:
     _trans = glocale.translation
 _ = _trans.gettext
 
-
-
 '''
    TimelineContingencyReport -- created once the user presses 'OK'
    The optionclass defined in the gpr file must inherit from MenuReportOptions.
@@ -66,52 +76,43 @@ class TimelineContingency(MenuReportOptions):
     def __init__(self, name, dbase):
         self.__db = dbase
         self.__pid = None
+        print('start MenuReportOptions.__init__(self, name, dbase)')
         MenuReportOptions.__init__(self, name, dbase)
-        print('finished __init__')
+        print('finish MenuReportOptions.__init__(self, name, dbase)')
 
-#   def get_subject(self):
-    #   self.__filter = FilterOption(_("People"), 0)
-    #   self.__filter.set_help(
-    #       _("Select people to use in the contingency report."))
-
-        """ Return a string that describes the subject of the report. """
-    #   gid = self.__pid.get_value()
-    #   person = self.__db.get_person_from_gramps_id(gid)
-    #   print('gid,person',gid,person)
-    #   print('returning from get_subject')
-    #   return displayer.display(person)
 
     def add_menu_options(self, menu):
+        print('start def add_menu_options(self, menu):')
 
         ##########################
         category_name = _("Report Options")
+        add_option = partial(menu.add_option, category_name)
         ##########################
 
     #   print(self.__pid)
         self.__pid = PersonOption(_("People"))
-        print(type(self.__pid))
         self.__pid.set_help(
             _("Select people to use in the contingency report."))
         menu.add_option(category_name, "pid", self.__pid)
         print(type(self.__pid))
+        print(self.__pid)
+        self.person_list = PersonOption(_("People"))
+        menu.add_option(category_name, 'pid_list',self.person_list)
+        print(type(self.person_list))
+        print(self.person_list)
 
-    #   recurse = EnumeratedListOption(_("Print sheets for"), self.RECURSE_NONE)
-    #   recurse.set_items([
-    #       (self.RECURSE_NONE, _("Center person only")),
-    #       (self.RECURSE_SIDE, _("Center person and descendants in side branches")),
-    #       (self.RECURSE_ALL,  _("Center person and all descendants"))])
-    #   recurse.set_help(_("Whether to include descendants, and which ones."))
-    #   print('here 2')
-    #   menu.add_option(category_name, "recurse", recurse)
+    #   person_list = PersonListOption(_('People of interest'))
+    #   person_list.set_help(_('People of interest are used as a starting '
+    #                          'point when determining "family lines".'))
+        add_option('gidlist', self.person_list)
 
-        '''
-        # --------------------------------
-        add_option = partial(menu.add_option, _('People of Interest'))
-        # --------------------------------
+        print('finish def add_menu_options(self, menu):')
 
-        person_list = PersonListOption(_('People of interest'))
-        person_list.set_help(_('People of interest are used as a starting '
-                               'point when determining "family lines".'))
-        add_option('gidlist', person_list)
+    def write_report(self):
+        print('reached def write_report(self)')
 
-        '''
+        """ write the report """
+
+        self.doc.start_paragraph("IDS-Normal")
+        doc.write_text('writing text')
+        doc.end_paragraph()
