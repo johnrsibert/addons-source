@@ -14,3 +14,4 @@ register(REPORT,
     report_modes = [REPORT_MODE_CLI, REPORT_MODE_GUI, REPORT_MODE_BKI],
     require_active = False,
     )
+#   category = REPORT_CAT,
