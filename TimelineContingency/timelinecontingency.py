@@ -70,6 +70,8 @@ from gramps.gen.plug import docgen
 #       - the actual report generation is done by this class
 #
 #------------------------------------------------------------------------
+# <option name="gidlist" value="I0003 I0222 I0223 I0217 I0216 I0170 I0166 I0108 "/>
+
 
 class TimelineContingencyOptions(MenuReportOptions):
     HERE(getframeinfo(currentframe()))
@@ -100,71 +102,71 @@ class TimelineContingencyOptions(MenuReportOptions):
         add_option = partial(menu.add_option, category_name)
         # ---------------------
 
-        followpar = BooleanOption(_('Follow parents to determine '
-                                    '"family lines"'), True)
-        followpar.set_help(_('Parents and their ancestors will be '
-                             'considered when determining "family lines".'))
-        add_option('followpar', followpar)
+#       followpar = BooleanOption(_('Follow parents to determine '
+#                                   '"family lines"'), True)
+#       followpar.set_help(_('Parents and their ancestors will be '
+#                            'considered when determining "family lines".'))
+#       add_option('followpar', followpar)
 
-        followchild = BooleanOption(_('Follow children to determine '
-                                      '"family lines"'), True)
-        followchild.set_help(_('Children will be considered when '
-                               'determining "family lines".'))
-        add_option('followchild', followchild)
+#       followchild = BooleanOption(_('Follow children to determine '
+#                                     '"family lines"'), True)
+#       followchild.set_help(_('Children will be considered when '
+#                              'determining "family lines".'))
+#       add_option('followchild', followchild)
 
-        remove_extra_people = BooleanOption(_('Try to remove extra '
-                                              'people and families'), True)
-        remove_extra_people.set_help(_('People and families not directly '
-                                       'related to people of interest will '
-                                       'be removed when determining '
-                                       '"family lines".'))
-        add_option('removeextra', remove_extra_people)
+#       remove_extra_people = BooleanOption(_('Try to remove extra '
+#                                             'people and families'), True)
+#       remove_extra_people.set_help(_('People and families not directly '
+#                                      'related to people of interest will '
+#                                      'be removed when determining '
+#                                      '"family lines".'))
+#       add_option('removeextra', remove_extra_people)
 
-        arrow = EnumeratedListOption(_("Arrowhead direction"), 'd')
-        for i in range( 0, len(_ARROWS) ):
-            arrow.add_item(_ARROWS[i]["value"], _ARROWS[i]["name"])
-        arrow.set_help(_("Choose the direction that the arrows point."))
-        add_option("arrow", arrow)
+#       arrow = EnumeratedListOption(_("Arrowhead direction"), 'd')
+#       for i in range( 0, len(_ARROWS) ):
+#           arrow.add_item(_ARROWS[i]["value"], _ARROWS[i]["name"])
+#       arrow.set_help(_("Choose the direction that the arrows point."))
+#       add_option("arrow", arrow)
 
-        color = EnumeratedListOption(_("Graph coloring"), "filled")
-        for COLOR in _COLORS:
-            color.add_item(COLOR["value"], COLOR["name"])
-        color.set_help(_("Males will be shown with blue, females "
-                         "with red, unless otherwise set above for filled. "
-                         "If the sex of an individual "
-                         "is unknown it will be shown with gray."))
-        add_option("color", color)
+#       color = EnumeratedListOption(_("Graph coloring"), "filled")
+#       for COLOR in _COLORS:
+#           color.add_item(COLOR["value"], COLOR["name"])
+#       color.set_help(_("Males will be shown with blue, females "
+#                        "with red, unless otherwise set above for filled. "
+#                        "If the sex of an individual "
+#                        "is unknown it will be shown with gray."))
+#       add_option("color", color)
 
-        roundedcorners = EnumeratedListOption(_("Rounded corners"), '')
-        for i in range( 0, len(_CORNERS) ):
-            roundedcorners.add_item(_CORNERS[i]["value"], _CORNERS[i]["name"])
-        roundedcorners.set_help(_("Use rounded corners e.g. to differentiate "
-                         "between women and men."))
-        add_option("useroundedcorners", roundedcorners)
+#       roundedcorners = EnumeratedListOption(_("Rounded corners"), '')
+#       for i in range( 0, len(_CORNERS) ):
+#           roundedcorners.add_item(_CORNERS[i]["value"], _CORNERS[i]["name"])
+#       roundedcorners.set_help(_("Use rounded corners e.g. to differentiate "
+#                        "between women and men."))
+#       add_option("useroundedcorners", roundedcorners)
 
-        stdoptions.add_gramps_id_option(menu, category_name, ownline=True)
+#       stdoptions.add_gramps_id_option(menu, category_name, ownline=True)
 
-        # ---------------------
-        category_name = _('Report Options (2)')
-        add_option = partial(menu.add_option, category_name)
-        # ---------------------
+#       # ---------------------
+#       category_name = _('Report Options (2)')
+#       add_option = partial(menu.add_option, category_name)
+#       # ---------------------
 
-        stdoptions.add_name_format_option(menu, category_name)
+#       stdoptions.add_name_format_option(menu, category_name)
 
-        stdoptions.add_private_data_option(menu, category_name, default=False)
+#       stdoptions.add_private_data_option(menu, category_name, default=False)
 
-        stdoptions.add_living_people_option(menu, category_name)
+#       stdoptions.add_living_people_option(menu, category_name)
 
-        locale_opt = stdoptions.add_localization_option(menu, category_name)
+#       locale_opt = stdoptions.add_localization_option(menu, category_name)
 
-        stdoptions.add_date_format_option(menu, category_name, locale_opt)
+#       stdoptions.add_date_format_option(menu, category_name, locale_opt)
 
-        use_subgraphs = BooleanOption(_('Use subgraphs'), True)
-        use_subgraphs.set_help(_("Subgraphs can help Graphviz position "
-                                 "spouses together, but with non-trivial "
-                                 "graphs will result in longer lines and "
-                                 "larger graphs."))
-        add_option("usesubgraphs", use_subgraphs)
+#       use_subgraphs = BooleanOption(_('Use subgraphs'), True)
+#       use_subgraphs.set_help(_("Subgraphs can help Graphviz position "
+#                                "spouses together, but with non-trivial "
+#                                "graphs will result in longer lines and "
+#                                "larger graphs."))
+#       add_option("usesubgraphs", use_subgraphs)
 
         HERE(getframeinfo(currentframe()))
         # --------------------------------
@@ -177,117 +179,117 @@ class TimelineContingencyOptions(MenuReportOptions):
         add_option('gidlist', person_list)
         HERE(getframeinfo(currentframe()))
 
-        self.limit_parents = BooleanOption(_('Limit the number of ancestors'),
-                                           False)
-        self.limit_parents.set_help(_('Whether to '
-                                      'limit the number of ancestors.'))
-        add_option('limitparents', self.limit_parents)
-        self.limit_parents.connect('value-changed', self.limit_changed)
+#       self.limit_parents = BooleanOption(_('Limit the number of ancestors'),
+#                                          False)
+#       self.limit_parents.set_help(_('Whether to '
+#                                     'limit the number of ancestors.'))
+#       add_option('limitparents', self.limit_parents)
+#       self.limit_parents.connect('value-changed', self.limit_changed)
 
-        self.max_parents = NumberOption('', 50, 10, 9999)
-        self.max_parents.set_help(_('The maximum number '
-                                    'of ancestors to include.'))
-        add_option('maxparents', self.max_parents)
+#       self.max_parents = NumberOption('', 50, 10, 9999)
+#       self.max_parents.set_help(_('The maximum number '
+#                                   'of ancestors to include.'))
+#       add_option('maxparents', self.max_parents)
 
-        self.limit_children = BooleanOption(_('Limit the number '
-                                              'of descendants'),
-                                            False)
-        self.limit_children.set_help(_('Whether to '
-                                       'limit the number of descendants.'))
-        add_option('limitchildren', self.limit_children)
-        self.limit_children.connect('value-changed', self.limit_changed)
+#       self.limit_children = BooleanOption(_('Limit the number '
+#                                             'of descendants'),
+#                                           False)
+#       self.limit_children.set_help(_('Whether to '
+#                                      'limit the number of descendants.'))
+#       add_option('limitchildren', self.limit_children)
+#       self.limit_children.connect('value-changed', self.limit_changed)
 
-        self.max_children = NumberOption('', 50, 10, 9999)
-        self.max_children.set_help(_('The maximum number '
-                                     'of descendants to include.'))
-        add_option('maxchildren', self.max_children)
+#       self.max_children = NumberOption('', 50, 10, 9999)
+#       self.max_children.set_help(_('The maximum number '
+#                                    'of descendants to include.'))
+#       add_option('maxchildren', self.max_children)
 
-        # --------------------
-        category_name = _('Include')
-        add_option = partial(menu.add_option, category_name)
-        # --------------------
+#       # --------------------
+#       category_name = _('Include')
+#       add_option = partial(menu.add_option, category_name)
+#       # --------------------
 
-        self.include_dates = BooleanOption(_('Include dates'), True)
-        self.include_dates.set_help(_('Whether to include dates for people '
-                                      'and families.'))
-        add_option('incdates', self.include_dates)
-        self.include_dates.connect('value-changed', self.include_dates_changed)
+#       self.include_dates = BooleanOption(_('Include dates'), True)
+#       self.include_dates.set_help(_('Whether to include dates for people '
+#                                     'and families.'))
+#       add_option('incdates', self.include_dates)
+#       self.include_dates.connect('value-changed', self.include_dates_changed)
 
-        self.justyears = BooleanOption(_("Limit dates to years only"), False)
-        self.justyears.set_help(_("Prints just dates' year, neither "
-                                  "month or day nor date approximation "
-                                  "or interval are shown."))
-        add_option("justyears", self.justyears)
+#       self.justyears = BooleanOption(_("Limit dates to years only"), False)
+#       self.justyears.set_help(_("Prints just dates' year, neither "
+#                                 "month or day nor date approximation "
+#                                 "or interval are shown."))
+#       add_option("justyears", self.justyears)
 
-        include_places = BooleanOption(_('Include places'), True)
-        include_places.set_help(_('Whether to include placenames for people '
-                                  'and families.'))
-        add_option('incplaces', include_places)
+#       include_places = BooleanOption(_('Include places'), True)
+#       include_places.set_help(_('Whether to include placenames for people '
+#                                 'and families.'))
+#       add_option('incplaces', include_places)
 
-        include_num_children = BooleanOption(_('Include the number of '
-                                               'children'), True)
-        include_num_children.set_help(_('Whether to include the number of '
-                                        'children for families with more '
-                                        'than 1 child.'))
-        add_option('incchildcnt', include_num_children)
+#       include_num_children = BooleanOption(_('Include the number of '
+#                                              'children'), True)
+#       include_num_children.set_help(_('Whether to include the number of '
+#                                       'children for families with more '
+#                                       'than 1 child.'))
+#       add_option('incchildcnt', include_num_children)
 
-        self.include_images = BooleanOption(_('Include '
-                                              'thumbnail images of people'),
-                                            True)
-        self.include_images.set_help(_('Whether to '
-                                       'include thumbnail images of people.'))
-        add_option('incimages', self.include_images)
-        self.include_images.connect('value-changed', self.images_changed)
+#       self.include_images = BooleanOption(_('Include '
+#                                             'thumbnail images of people'),
+#                                           True)
+#       self.include_images.set_help(_('Whether to '
+#                                      'include thumbnail images of people.'))
+#       add_option('incimages', self.include_images)
+#       self.include_images.connect('value-changed', self.images_changed)
 
-        self.image_location = EnumeratedListOption(_('Thumbnail location'), 0)
-        self.image_location.add_item(0, _('Above the name'))
-        self.image_location.add_item(1, _('Beside the name'))
-        self.image_location.set_help(_('Where the thumbnail image '
-                                       'should appear relative to the name'))
-        add_option('imageonside', self.image_location)
+#       self.image_location = EnumeratedListOption(_('Thumbnail location'), 0)
+#       self.image_location.add_item(0, _('Above the name'))
+#       self.image_location.add_item(1, _('Beside the name'))
+#       self.image_location.set_help(_('Where the thumbnail image '
+#                                      'should appear relative to the name'))
+#       add_option('imageonside', self.image_location)
 
-        self.image_size = EnumeratedListOption(_('Thumbnail size'), SIZE_NORMAL)
-        self.image_size.add_item(SIZE_NORMAL, _('Normal'))
-        self.image_size.add_item(SIZE_LARGE, _('Large'))
-        self.image_size.set_help(_('Size of the thumbnail image'))
-        add_option('imagesize', self.image_size)
+#       self.image_size = EnumeratedListOption(_('Thumbnail size'), SIZE_NORMAL)
+#       self.image_size.add_item(SIZE_NORMAL, _('Normal'))
+#       self.image_size.add_item(SIZE_LARGE, _('Large'))
+#       self.image_size.set_help(_('Size of the thumbnail image'))
+#       add_option('imagesize', self.image_size)
 
-        # ----------------------------
-        add_option = partial(menu.add_option, _('Family Colors'))
-        # ----------------------------
+#       # ----------------------------
+#       add_option = partial(menu.add_option, _('Family Colors'))
+#       # ----------------------------
 
-        surname_color = SurnameColorOption(_('Family colors'))
-        surname_color.set_help(_('Colors to use for various family lines.'))
-        add_option('surnamecolors', surname_color)
+#       surname_color = SurnameColorOption(_('Family colors'))
+#       surname_color.set_help(_('Colors to use for various family lines.'))
+#       add_option('surnamecolors', surname_color)
 
-        # -------------------------
-        add_option = partial(menu.add_option, _('Individuals'))
-        # -------------------------
+#       # -------------------------
+#       add_option = partial(menu.add_option, _('Individuals'))
+#       # -------------------------
 
-        color_males = ColorOption(_('Males'), '#e0e0ff')
-        color_males.set_help(_('The color to use to display men.'))
-        add_option('colormales', color_males)
+#       color_males = ColorOption(_('Males'), '#e0e0ff')
+#       color_males.set_help(_('The color to use to display men.'))
+#       add_option('colormales', color_males)
 
-        color_females = ColorOption(_('Females'), '#ffe0e0')
-        color_females.set_help(_('The color to use to display women.'))
-        add_option('colorfemales', color_females)
+#       color_females = ColorOption(_('Females'), '#ffe0e0')
+#       color_females.set_help(_('The color to use to display women.'))
+#       add_option('colorfemales', color_females)
 
-        color_unknown = ColorOption(_('Unknown'), '#e0e0e0')
-        color_unknown.set_help(_('The color to use '
-                                 'when the gender is unknown.'))
-        add_option('colorunknown', color_unknown)
+#       color_unknown = ColorOption(_('Unknown'), '#e0e0e0')
+#       color_unknown.set_help(_('The color to use '
+#                                'when the gender is unknown.'))
+#       add_option('colorunknown', color_unknown)
 
-        color_family = ColorOption(_('Families'), '#ffffe0')
-        color_family.set_help(_('The color to use to display families.'))
-        add_option('colorfamilies', color_family)
+#       color_family = ColorOption(_('Families'), '#ffffe0')
+#       color_family.set_help(_('The color to use to display families.'))
+#       add_option('colorfamilies', color_family)
 
-        self.limit_changed()
-        self.images_changed()
+#       self.limit_changed()
+#       self.images_changed()
 
    
         print('finish def add_menu_options(self, menu):')
 
-class TimelineContingency(Report):
+class TimelineContingencyReport(Report):
     HERE(getframeinfo(currentframe()))
     def __init__(self, database, options, user):
         HERE(getframeinfo(currentframe()))
@@ -300,7 +302,7 @@ class TimelineContingency(Report):
         get_option_by_name = menu.get_option_by_name
         get_value = lambda name: get_option_by_name(name).get_value()
 
-        self.set_locale(menu.get_option_by_name('trans').get_value())
+#       self.set_locale(menu.get_option_by_name('trans').get_value())
 
         stdoptions.run_date_format_option(self, menu)
 
