@@ -54,7 +54,7 @@ from gramps.gen.utils.db import get_birth_or_fallback, get_death_or_fallback
 from gramps.gen.proxy import CacheProxyDb
 from gramps.gen.errors import ReportError
 from gramps.gen.display.place import displayer as _pd
-import gramps.gen.plug._options
+
 from gramps.gen.plug import docgen
 
 #------------------------------------------------------------------------
@@ -288,6 +288,7 @@ class TimelineContingencyOptions(MenuReportOptions):
 
    
         print('finish def add_menu_options(self, menu):')
+        HERE(getframeinfo(currentframe()))
 
 class TimelineContingencyReport(Report):
     HERE(getframeinfo(currentframe()))
@@ -302,14 +303,18 @@ class TimelineContingencyReport(Report):
         get_option_by_name = menu.get_option_by_name
         get_value = lambda name: get_option_by_name(name).get_value()
 
+        HERE(getframeinfo(currentframe()))
 #       self.set_locale(menu.get_option_by_name('trans').get_value())
 
-        stdoptions.run_date_format_option(self, menu)
+        HERE(getframeinfo(currentframe()))
+#       stdoptions.run_date_format_option(self, menu)
 
-        stdoptions.run_private_data_option(self, menu)
-        stdoptions.run_living_people_option(self, menu, self._locale)
+        HERE(getframeinfo(currentframe()))
+#       stdoptions.run_private_data_option(self, menu)
+#       stdoptions.run_living_people_option(self, menu, self._locale)
         self.database = CacheProxyDb(self.database)
         self._db = self.database
+        HERE(getframeinfo(currentframe()))
 
 
        # initialize several convenient variables
@@ -323,7 +328,8 @@ class TimelineContingencyReport(Report):
 #       self._followpar = get_value('followpar')
 #       self._followchild = get_value('followchild')
 #       self._removeextra = get_value('removeextra')
-#       self._gidlist = get_value('gidlist')
+        HERE(getframeinfo(currentframe()))
+        self._gidlist = get_value('gidlist')
 #       self._colormales = get_value('colormales')
 #       self._colorfemales = get_value('colorfemales')
 #       self._colorunknown = get_value('colorunknown')
@@ -350,15 +356,23 @@ class TimelineContingencyReport(Report):
         if not self._gidlist:
             raise ReportError(_('Empty report'),
                               _('You did not specify anybody'))
+        HERE(getframeinfo(currentframe()))
+#       print(gidlist)
+        print(self._gidlist)
         for gid in self._gidlist.split():
             person = self._db.get_person_from_gramps_id(gid)
             if person:
                 #option can be from another family tree, so person can be None
                 self._interest_set.add(person.get_handle())
 
-        stdoptions.run_name_format_option(self, menu)
+        HERE(getframeinfo(currentframe()))
+#       print(gidlist)
+        print(self._gidlist)
+#       stdoptions.run_name_format_option(self, menu)
+        HERE(getframeinfo(currentframe()))
 
-    
+         
+    HERE(getframeinfo(currentframe()))
 
 
 
@@ -366,11 +380,11 @@ class TimelineContingencyReport(Report):
     def begin_report(self):
         print('reached def begin_report(self)')
 
-#       """ write the report """
-#       mark1 = docgen.IndexMark(_('Family Sheet'), docgen.INDEX_TYPE_TOC, 1)
-#       self.doc.start_paragraph('FSR-Key')
-#       self.doc.write_text('', mark1) # for use in a TOC in a book report
-#       self.doc.end_paragraph()
+        """ write the report """
+        mark1 = docgen.IndexMark(_('Timeline Contingency Table'), docgen.INDEX_TYPE_TOC, 1)
+        self.doc.start_paragraph('FSR-Key')
+        self.doc.write_text('', mark1) # for use in a TOC in a book report
+        self.doc.end_paragraph()
 
 
         print('finished def begin_report(self)')
