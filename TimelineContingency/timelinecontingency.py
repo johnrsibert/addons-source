@@ -124,11 +124,11 @@ class TimelineContingencyReport(Report):
         TRACE(getframeinfo(currentframe()),type(self.person_id)) # I0166 (gid)
         TRACE(getframeinfo(currentframe()),self.person_id) # I0166 (gid)
 
-        self.recurse      = menu.get_option_by_name('recurse').get_value()
-        self.callname     = menu.get_option_by_name('callname').get_value()
-        self.placeholder  = menu.get_option_by_name('placeholder').get_value()
-        self.incl_sources = menu.get_option_by_name('incl_sources').get_value()
-        self.incl_notes   = menu.get_option_by_name('incl_notes').get_value()
+        self.recurse      = False #menu.get_option_by_name('recurse').get_value()
+        self.callname     = False #menu.get_option_by_name('callname').get_value()
+        self.placeholder  = False #menu.get_option_by_name('placeholder').get_value()
+        self.incl_sources = False #menu.get_option_by_name('incl_sources').get_value()
+        self.incl_notes   = False #menu.get_option_by_name('incl_notes').get_value()
 
 
     def write_report(self):
@@ -136,10 +136,11 @@ class TimelineContingencyReport(Report):
         sa = SimpleAccess(self.database)
 
         gid_list = self.person_id.split()
+        print(len(gid_list),'names:',gid_list)
         for count, gid in enumerate(gid_list):
             print()
-            print(count,gid)
             person = self.database.get_person_from_gramps_id(gid)
+            print(count,gid,person)
 
             print("Person        : ", sa.name(person))
             print("Gender        : ", sa.gender(person))
@@ -151,16 +152,18 @@ class TimelineContingencyReport(Report):
         #   print("Mother        : ", sa.name(sa.mother(person)))
         #   print("Spouse        : ", sa.name(sa.spouse(person)))
         #   print("Marriage Type : ", sa.marriage_type(person))
-            print("Marriage Date : ", sa.marriage_date(person))
-            print("Marriage Place: ", sa.marriage_place(person))
+        #   print("Marriage Date : ", sa.marriage_date(person))
+        #   print("Marriage Place: ", sa.marriage_place(person))
            
         #   for child in sa.children(person):
         #       print("Child         : ", sa.name(child))
 
             # Print out burial and baptism events
-            for event in sa.events( person , [ "Burial", "Death", "Residence" ]):
+            for event in sa.events( person):# , [ "Burial", "Death", "Residence", "Marriage" ]):
                print("Event         : ", sa.event_type(event), sa.event_date(event), 
                       sa.event_place(event))
+
+            if (1): return
 
             '''
             head_name = str(_Name_get_styled(person.get_primary_name(),
@@ -181,17 +184,20 @@ class TimelineContingencyReport(Report):
 
         """
         Build the actual report.
-        """
-
         mark1 = docgen.IndexMark(_('Family Sheet'), docgen.INDEX_TYPE_TOC, 1)
         self.doc.start_paragraph('FSR-Key')
         self.doc.write_text('', mark1) # for use in a TOC in a book report
         self.doc.end_paragraph()
+        """
 
+#       mark1 = docgen.IndexMark(_('Timeline Contingeny Table'), docgen.INDEX_TYPE_TOC, 1)
+        self.doc.start_paragraph('FSR-Title')
+        self.doc.write_text('Timeline Contingeny Table')#, mark1) # for use in a TOC in a book report
+        self.doc.end_paragraph()
+        ''' 
         TRACE(getframeinfo(currentframe()),self.person_id) # I0166 (gid)
         person = self.database.get_person_from_gramps_id(self.person_id)
         TRACE(getframeinfo(currentframe()),person) # <gramps.gen.lib.person.Person object at 0x7f2adbffd5e0>
-        ''' 
         names = person.get_alternate_names()
         TRACE(getframeinfo(currentframe()),names) 
         for count,nn in enumerate(names):
@@ -204,14 +210,59 @@ class TimelineContingencyReport(Report):
         TRACE(getframeinfo(currentframe()),ahnentafel) # 0
         TRACE(getframeinfo(currentframe()),person_key) # ' '
 
-#       pperson = str(_Name_get_styled(person.get_primary_name(),
-#                                        _Name_CALLNAME_DONTUSE))
+        pperson = str(_Name_get_styled(person.get_primary_name(),
+                                         _Name_CALLNAME_DONTUSE))
 
-#       TRACE(getframeinfo(currentframe()),pperson)
+        TRACE(getframeinfo(currentframe()),pperson)
 
 
 #       self.__process_person(person, rank, ahnentafel, person_key)
 
+       # --- Now let the party begin! ---
+
+#       head_name = str(_Name_get_styled(person.get_primary_name(),
+#                                        _Name_CALLNAME_DONTUSE))
+#       head_name = "Timeline Contingrency Table (2)"
+#       mark2 = docgen.IndexMark(head_name, docgen.INDEX_TYPE_TOC, 2)
+
+#       self.doc.start_paragraph('FSR-Key')
+#       self.doc.write_text(person_key, mark2)
+#       self.doc.end_paragraph()
+
+        self.doc.start_table(None, 'FSR-Table')
+
+        self.doc.start_row()
+
+        self.doc.start_cell('FSR-HeadCell', 1)
+        self.doc.start_paragraph('FSR-Name')
+        self.doc.write_text("Year")#, mark)
+        self.doc.end_paragraph()
+        self.doc.end_cell()
+
+        for c, gid in enumerate(gid_list):
+            self.doc.start_cell('FSR-HeadCell', 1)
+            self.doc.start_paragraph('FSR-Name')
+#  note = '{0} Largest Counties; {1:,} Cases; {2:,} Deaths'.format(nG,tcases,tdeaths)
+            person = self.database.get_person_from_gramps_id(gid)
+            pperson = str(_Name_get_styled(person.get_primary_name(),
+                                         _Name_CALLNAME_DONTUSE))
+
+            
+            print(c,type(gid),gid,pperson)
+            if c == 2:
+                print('----',c,type(gid),gid,pperson)
+                print('    ',person.get_primary_event_ref_list())
+
+        #   self.doc.write_text(gid)
+            self.doc.write_text('{0}\n({1})'.format(pperson,gid))
+            self.doc.end_paragraph()
+            self.doc.end_cell()
+
+        self.doc.end_row()
+
+        self.doc.end_table()
+
+  
 
     def __process_person(self, person, rank, ahnentafel, person_key):
         """
@@ -249,13 +300,13 @@ class TimelineContingencyReport(Report):
 
         # --- Now let the party begin! ---
 
-        head_name = str(_Name_get_styled(person.get_primary_name(),
-                                         _Name_CALLNAME_DONTUSE))
-        mark2 = docgen.IndexMark(head_name, docgen.INDEX_TYPE_TOC, 2)
+#       head_name = str(_Name_get_styled(person.get_primary_name(),
+#                                        _Name_CALLNAME_DONTUSE))
+#       mark2 = docgen.IndexMark(head_name, docgen.INDEX_TYPE_TOC, 2)
 
-        self.doc.start_paragraph('FSR-Key')
-        self.doc.write_text(person_key, mark2)
-        self.doc.end_paragraph()
+#       self.doc.start_paragraph('FSR-Key')
+#       self.doc.write_text(person_key, mark2)
+#       self.doc.end_paragraph()
 
         self.doc.start_table(None, 'FSR-Table')
 
@@ -946,40 +997,39 @@ class TimelineContingencyOptions(MenuReportOptions):
         category_name = _("Report Options")
         ##########################
 
-    #   self.__pid = PersonOption(_("Center person"))
         self.__pid = PersonListOption(_("People of Interest"))
         self.__pid.set_help(
-            _("The person whose partners and children are printed"))
+            _("Names of people comprising columns of table."))
         menu.add_option(category_name, "pid", self.__pid)
 
-        recurse = EnumeratedListOption(_("Print sheets for"), self.RECURSE_NONE)
-        recurse.set_items([
-            (self.RECURSE_NONE, _("Center person only")),
-            (self.RECURSE_SIDE, _("Center person and descendants in side branches")),
-            (self.RECURSE_ALL,  _("Center person and all descendants"))])
-        recurse.set_help(_("Whether to include descendants, and which ones."))
-        menu.add_option(category_name, "recurse", recurse)
+#       recurse = EnumeratedListOption(_("Print sheets for"), self.RECURSE_NONE)
+#       recurse.set_items([
+#           (self.RECURSE_NONE, _("Center person only")),
+#           (self.RECURSE_SIDE, _("Center person and descendants in side branches")),
+#           (self.RECURSE_ALL,  _("Center person and all descendants"))])
+#       recurse.set_help(_("Whether to include descendants, and which ones."))
+#       menu.add_option(category_name, "recurse", recurse)
 
-        callname = EnumeratedListOption(_("Use call name"), _Name_CALLNAME_DONTUSE)
-        callname.set_items([
-            (_Name_CALLNAME_DONTUSE, _("Don't use call name")),
-            (_Name_CALLNAME_REPLACE, _("Replace first name with call name")),
-            (_Name_CALLNAME_UNDERLINE_ADD, _("Underline call name in first name / add call name to first name"))])
-        callname.set_help(_("Whether to include call name, and how."))
-        menu.add_option(category_name, "callname", callname)
+#       callname = EnumeratedListOption(_("Use call name"), _Name_CALLNAME_DONTUSE)
+#       callname.set_items([
+#           (_Name_CALLNAME_DONTUSE, _("Don't use call name")),
+#           (_Name_CALLNAME_REPLACE, _("Replace first name with call name")),
+#           (_Name_CALLNAME_UNDERLINE_ADD, _("Underline call name in first name / add call name to first name"))])
+#       callname.set_help(_("Whether to include call name, and how."))
+#       menu.add_option(category_name, "callname", callname)
 
-        placeholder = BooleanOption( _("Print placeholders for missing information"), True)
-        placeholder.set_help(
-            _("Whether to include fields for missing information."))
-        menu.add_option(category_name, "placeholder", placeholder)
+#       placeholder = BooleanOption( _("Print placeholders for missing information"), True)
+#       placeholder.set_help(
+#           _("Whether to include fields for missing information."))
+#       menu.add_option(category_name, "placeholder", placeholder)
 
-        incl_sources = BooleanOption( _("Include sources"), True)
-        incl_sources.set_help(_("Whether to include source references."))
-        menu.add_option(category_name, "incl_sources", incl_sources)
+#       incl_sources = BooleanOption( _("Include sources"), True)
+#       incl_sources.set_help(_("Whether to include source references."))
+#       menu.add_option(category_name, "incl_sources", incl_sources)
 
-        incl_notes = BooleanOption( _("Include notes"), True)
-        incl_notes.set_help(_("Whether to include notes."))
-        menu.add_option(category_name, "incl_notes", incl_notes)
+#       incl_notes = BooleanOption( _("Include notes"), True)
+#       incl_notes.set_help(_("Whether to include notes."))
+#       menu.add_option(category_name, "incl_notes", incl_notes)
 
 
     def make_default_style(self, default_style):
@@ -1010,9 +1060,22 @@ class TimelineContingencyOptions(MenuReportOptions):
         font.set_size(12)
         font.set_bold(1)
         para = docgen.ParagraphStyle()
+        para.set_alignment(docgen.PARA_ALIGN_CENTER)
         para.set_font(font)
         para.set_description(_("The style used for names"))
-        default_style.add_paragraph_style('FSR-Name', para)
+        default_style.add_paragraph_style('FSR-Name', para) # *
+
+
+        font = docgen.FontStyle()
+        font.set_type_face(docgen.FONT_SANS_SERIF)
+        font.set_size(14)
+        font.set_bold(1)
+        para = docgen.ParagraphStyle()
+        para.set_alignment(docgen.PARA_ALIGN_CENTER)
+        para.set_font(font)
+        para.set_description(_("The style used for table title"))
+        default_style.add_paragraph_style('FSR-Title', para) # *
+
 
         font = docgen.FontStyle()
         font.set_type_face(docgen.FONT_SANS_SERIF)
@@ -1067,8 +1130,15 @@ class TimelineContingencyOptions(MenuReportOptions):
 
         table = docgen.TableStyle()
         table.set_width(100)
-        table.set_columns(3)
-        table.set_column_width(0, 7)
-        table.set_column_width(1, 7)
-        table.set_column_width(2, 86)
+        table.set_columns(4)
+        w0 = 8
+        table.set_column_width(0, w0)
+        w = (100-w0)/3
+        for c in range(1,4):
+            print('column',c)
+            table.set_column_width(c, w)
+
+#       table.set_column_width(0, 7)
+#       table.set_column_width(1, 7)
+#       table.set_column_width(2, 86)
         default_style.add_table_style('FSR-Table', table)
