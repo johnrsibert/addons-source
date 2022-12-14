@@ -1,7 +1,6 @@
 from inspect import currentframe, getframeinfo
 def HERE(frameinfo):
-#   frameinfo = getframeinfo(currentframe())
-#   print(frameinfo.filename, frameinfo.lineno)
+#   HERE(getframeinfo(currentframe()))
     print('REACHED LINE', frameinfo.lineno)
 
 def TRACE(frameinfo,value):
@@ -53,6 +52,7 @@ from gramps.gen.plug import docgen
 from gramps.gen.plug.menu import BooleanOption, EnumeratedListOption, PersonListOption
 from gramps.gen.plug.report import Report
 from gramps.gen.plug.report import utils
+
 from gramps.gen.plug.report import MenuReportOptions
 import gramps.gen.datehandler
 from gramps.gen.relationship import get_relationship_calculator
@@ -119,10 +119,12 @@ class TimelineContingencyReport(Report):
         """
 
         Report.__init__(self, database, options, user)
-   #    TRACE(getframeinfo(currentframe()),options.get_options())
+   #    Report.set_table_columns(4)
+
+        self.__options = options
 
         menu = options.menu
-        self.person_id    = menu.get_option_by_name('pid').get_value()
+        self.person_id = menu.get_option_by_name('pid').get_value()
         TRACE(getframeinfo(currentframe()),type(self.person_id)) # I0166 (gid)
         TRACE(getframeinfo(currentframe()),self.person_id) # I0166 (gid)
         self.gid_list = self.person_id.split()
@@ -151,8 +153,8 @@ class TimelineContingencyReport(Report):
     '''
 
     def write_report(self):
-
-    #   TRACE(getframeinfo(currentframe()),default_style)
+        HERE(getframeinfo(currentframe()))
+    
         sa = SimpleAccess(self.database)
 
         print(len(self.gid_list),'names:',self.gid_list)
@@ -185,39 +187,54 @@ class TimelineContingencyReport(Report):
         #   if (1): return
 
 
-#       self.start_table()
-
-       
-
         self.doc.start_paragraph('TCR-Title')
         self.doc.write_text('Timeline Contingeny Table')
         self.doc.end_paragraph()
 
+        TRACE(getframeinfo(currentframe()),type(person))
+        TRACE(getframeinfo(currentframe()),vars(person))
         pperson = str(_Name_get_styled(person.get_primary_name()))
-                                      #  _Name_CALLNAME_DONTUSE))
+
+    #   eref = person.event_ref_list[0]
+    #   TRACE(getframeinfo(currentframe()),type(eref))
+    #   TRACE(getframeinfo(currentframe()),vars(eref))
+    #   TRACE(getframeinfo(currentframe()),eref.get_referenced_handles())
 
         TRACE(getframeinfo(currentframe()),pperson)
+        for e, erefl in enumerate(person.event_ref_list):
+            print(e,type(erefl),vars(erefl))
+            event = self.database.get_event_from_handle(erefl.get_reference_handle())
+            print('    event',e,':',event.get_type())#type(event),vars(event),event)
+            place_handle = event.get_place_handle()
+            print('            :',place_handle)
+            place = self.database.get_place_from_handle(place_handle)
+            print('            :',place)
+            place_title = place_displayer.display(self.database, place)
+            print('            :',place_title)
+                 
+        #        displayer.display(o.get_date_object())
+            date = event.get_date_object()
+            year = date.get_year()
+        #   print(date,type(date),vars(date))
+        #   print('            :')
+            print('            :',year)
+        #   print('           :',type(year),str(year))
+        #   es = event.get_schema()
+        #   print('           :',es)#['gramps_id'])          
+
+            eid = event.get_gramps_id()
+            print('           :',type(eid),eid)
+
+    #   erefh = eref.get_referenced_handles()[0]
+    #   TRACE(getframeinfo(currentframe()),type(erefh))
+    #   TRACE(getframeinfo(currentframe()),erefh)
 
 
-#       self.__process_person(person, rank, ahnentafel, person_key)
 
-       # --- Now let the party begin! ---
 
+     #  --- Now let the party begin! ---
 
         self.doc.start_table(None, 'TCR-Table')
-        table = docgen.TableStyle()
-        TRACE(getframeinfo(currentframe()),type(table))
-        ncol = len(self.gid_list)+1
-        TRACE(getframeinfo(currentframe()),ncol)
-        TRACE(getframeinfo(currentframe()),type(ncol))
-        table.set_width(100)
-        table.set_columns(ncol)
-        w0 = 8
-        table.set_column_width(0, w0)
-        w = (100-w0)/(ncol-1)
-        for c in range(1,ncol):
-            print('column',c)
-            table.set_column_width(c, w)
 
 
         self.doc.start_row()
@@ -231,18 +248,11 @@ class TimelineContingencyReport(Report):
         for c, gid in enumerate(self.gid_list):
             self.doc.start_cell('TCR-HeadCell', 1)
             self.doc.start_paragraph('TCR-Name')
-#  note = '{0} Largest Counties; {1:,} Cases; {2:,} Deaths'.format(nG,tcases,tdeaths)
             person = self.database.get_person_from_gramps_id(gid)
             pperson = str(_Name_get_styled(person.get_primary_name()))
                                        # _Name_CALLNAME_DONTUSE))
 
-            
-        #   print(c,type(gid),gid,pperson)
-        #   if c == 2:
-        #       print('----',c,type(gid),gid,pperson)
-        #       print('    ',person.get_primary_event_ref_list())
-
-        #   self.doc.write_text(gid)
+#  note = '{0} Largest Counties; {1:,} Cases; {2:,} Deaths'.format(nG,tcases,tdeaths)
             self.doc.write_text('{0}\n({1})'.format(pperson,gid))
             self.doc.end_paragraph()
             self.doc.end_cell()
@@ -281,54 +291,64 @@ class TimelineContingencyOptions(MenuReportOptions):
     def __init__(self, name, dbase):
         self.__db = dbase
         self.__pid = None
+        self.__table = None
         MenuReportOptions.__init__(self, name, dbase)
         HERE(getframeinfo(currentframe()))
+        
 
     def get_subject(self):
         HERE(getframeinfo(currentframe()))
         """ Return a string that describes the subject of the report. """
         gid = self.__pid.get_value()
-        TRACE(getframeinfo(currentframe()),gid) # I0166 (gid)
+        TRACE(getframeinfo(currentframe()),self.__pid)
         person = self.__db.get_person_from_gramps_id(gid)
-        TRACE(getframeinfo(currentframe()),person) 
-        names = person.get_alternate_names()
-        TRACE(getframeinfo(currentframe()),names) 
+        TRACE(getframeinfo(currentframe()),displayer.display(person))
+        return displayer.display(person)
 
 
     def add_menu_options(self, menu):
+        HERE(getframeinfo(currentframe()))
 
         ##########################
         category_name = _("Report Options")
         ##########################
 
         self.__pid = PersonListOption(_("People of Interest"))
+        gid = self.__pid.get_value()
         self.__pid.set_help(
             _("Names of people comprising columns of table."))
         menu.add_option(category_name, "pid", self.__pid)
 
+    def set_table_columns(self,ncol):
+        TRACE(getframeinfo(currentframe()),ncol)
+        table = docgen.TableStyle(ncol)
+        table.set_width(100)
+        table.set_columns(ncol)
+        w0 = 8
+        table.set_column_width(0, w0)
+        w = (100-w0)/(ncol-1)
+        for c in range(1,ncol):
+            print('column',c)
+            table.set_column_width(c, w)
+
+        default_style.add_table_style('FSR-Table', table)
 
     def make_default_style(self, default_style):
-        """Make default output style for the Family Sheet Report."""
-        TRACE(getframeinfo(currentframe()),default_style)
         HERE(getframeinfo(currentframe()))
-        pnames = default_style.get_paragraph_style_names()
-        TRACE(getframeinfo(currentframe()),pnames)
+        """Make default output style for the Family Sheet Report."""
         #Paragraph Styles
         table = docgen.TableStyle()
         table.set_width(100)
-   #    table.set_columns(4)
+        table.set_columns(4)
         w0 = 8
         table.set_column_width(0, w0)
-   #    w = (100-w0)/3
-   #    for c in range(1,4):
-   #        print('column',c)
-   #        table.set_column_width(c, w)
+        w = (100-w0)/3
+        for c in range(1,4):
+            print('column',c)
+            table.set_column_width(c, w)
 
         default_style.add_table_style('TCR-Table', table)
-
-        TRACE(getframeinfo(currentframe()),default_style)
-        pnames = default_style.get_paragraph_style_names()
-        TRACE(getframeinfo(currentframe()),pnames)
+        self.__table = table
 
         font = docgen.FontStyle()
         font.set_type_face(docgen.FONT_SANS_SERIF)
@@ -340,9 +360,7 @@ class TimelineContingencyOptions(MenuReportOptions):
         para.set_description(_("The style used for table title"))
         default_style.add_paragraph_style('TCR-Title', para) 
 
-        TRACE(getframeinfo(currentframe()),default_style)
         pnames = default_style.get_paragraph_style_names()
-        TRACE(getframeinfo(currentframe()),pnames)
 
         #Table Styles
         cell = docgen.TableCellStyle()
@@ -352,9 +370,9 @@ class TimelineContingencyOptions(MenuReportOptions):
         cell.set_right_border(1)
         default_style.add_cell_style('TCR-HeadCell', cell)
 
-        TRACE(getframeinfo(currentframe()),default_style)
-        pnames = default_style.get_paragraph_style_names()
-        TRACE(getframeinfo(currentframe()),pnames)
+   #    TRACE(getframeinfo(currentframe()),default_style)
+   #    pnames = default_style.get_paragraph_style_names()
+   #    TRACE(getframeinfo(currentframe()),pnames)
 
         font = docgen.FontStyle()
         font.set_type_face(docgen.FONT_SANS_SERIF)
@@ -366,9 +384,9 @@ class TimelineContingencyOptions(MenuReportOptions):
         para.set_description(_("The style used for names"))
         default_style.add_paragraph_style('TCR-Name', para) # *
 
-        TRACE(getframeinfo(currentframe()),default_style)
-        pnames = default_style.get_paragraph_style_names()
-        TRACE(getframeinfo(currentframe()),pnames)
+   #    TRACE(getframeinfo(currentframe()),default_style)
+   #    pnames = default_style.get_paragraph_style_names()
+   #    TRACE(getframeinfo(currentframe()),pnames)
 
 
 
