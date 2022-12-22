@@ -64,6 +64,9 @@ except ValueError:
 _ = _trans.gettext
 from gramps.gen.simple._simpleaccess import SimpleAccess
 
+#import pandas as pd
+#import numpy as np
+
 #------------------------------------------------------------------------
 #
 # Constants
@@ -130,11 +133,9 @@ class TimelineContingencyReport(Report):
         self.gid_list = self.person_id.split()
         TRACE(getframeinfo(currentframe()),self.gid_list) # I0166 (gid)
 
-        self.recurse      = False #menu.get_option_by_name('recurse').get_value()
-        self.callname     = False #menu.get_option_by_name('callname').get_value()
-        self.placeholder  = False #menu.get_option_by_name('placeholder').get_value()
-        self.incl_sources = False #menu.get_option_by_name('incl_sources').get_value()
-        self.incl_notes   = False #menu.get_option_by_name('incl_notes').get_value()
+    #   self.placeholder  = False #menu.get_option_by_name('placeholder').get_value()
+    #   self.incl_sources = False #menu.get_option_by_name('incl_sources').get_value()
+    #   self.incl_notes   = False #menu.get_option_by_name('incl_notes').get_value()
     '''
     def start_table(self):
         ncol = len(self.gid_list)+1
@@ -151,113 +152,179 @@ class TimelineContingencyReport(Report):
 
         default_style.add_table_style('FSR-Table', table)
     '''
+    
+    def get_year(self,event):
+        date = event.get_date_object()
+        return(int(date.get_year()))
+
+    def get_place(self,event):
+        place_handle = event.get_place_handle()
+        place = self.database.get_place_from_handle(place_handle)
+        place_title = place_displayer.display(self.database, place)
+        return(place_title)
+
 
     def write_report(self):
+    #   sa = SimpleAccess(self.database)
         HERE(getframeinfo(currentframe()))
     
-        sa = SimpleAccess(self.database)
+        year_list = []
 
-        print(len(self.gid_list),'names:',self.gid_list)
-        for count, gid in enumerate(self.gid_list):
+    #   loop through persons of interest 
+        print(len(self.gid_list),'gids:',self.gid_list)
+    
+        for gcount, gid in enumerate(self.gid_list):
             print()
             person = self.database.get_person_from_gramps_id(gid)
-            print(count,gid,person)
+            pperson = str(_Name_get_styled(person.get_primary_name()))
+            print(gcount,gid,pperson)
 
-            print("Person        : ", sa.name(person))
-            print("Gender        : ", sa.gender(person))
-            print("Birth date    : ", sa.birth_date(person))
-            print("Birth place   : ", sa.birth_place(person))
-            print("Death date    : ", sa.death_date(person))
-        #   print("Death place   : ", sa.death_place(person))
-        #   print("Father        : ", sa.name(sa.father(person)))
-        #   print("Mother        : ", sa.name(sa.mother(person)))
-        #   print("Spouse        : ", sa.name(sa.spouse(person)))
-        #   print("Marriage Type : ", sa.marriage_type(person))
-        #   print("Marriage Date : ", sa.marriage_date(person))
-        #   print("Marriage Place: ", sa.marriage_place(person))
-           
-        #   for child in sa.children(person):
-        #       print("Child         : ", sa.name(child))
+            # loop through events associated with person of interest
+            for endx, erefl in enumerate(person.event_ref_list):
+                event = self.database.get_event_from_handle(erefl.get_reference_handle())
+                eid = event.get_gramps_id()
+                date = event.get_date_object()
+                year = date.get_year()
+                place_handle = event.get_place_handle()
+                place = self.database.get_place_from_handle(place_handle)
+                place_title = place_displayer.display(self.database, place)
+                year_list.append(int(year))
 
-            # Print out burial and baptism events
-            for event in sa.events( person):# , [ "Burial", "Death", "Residence", "Marriage" ]):
-               print("Event         : ", sa.event_type(event), sa.event_date(event), 
-                      sa.event_place(event))
+                print('endx:',endx,type(erefl),erefl.ref)
+                print(' len:',type(person.event_ref_list),len(person.event_ref_list))
+                print('    :',person.event_ref_list[endx])
+                print('  ID:',eid)
+                print('year:',year)
+                print('plac:',place_title)
+                print('')
 
-        #   if (1): return
 
+        #   print(year_list)
+        place = None
+
+   
+        print()
+    #   print(year_list)
+        year_set = set(year_list)
+    #   print(year_set)
+        year_set = sorted(year_set)
+        print(year_set)
+
+    #   --- Now let the party begin! ---
 
         self.doc.start_paragraph('TCR-Title')
         self.doc.write_text('Timeline Contingeny Table')
         self.doc.end_paragraph()
 
-        TRACE(getframeinfo(currentframe()),type(person))
-        TRACE(getframeinfo(currentframe()),vars(person))
-        pperson = str(_Name_get_styled(person.get_primary_name()))
-
-    #   eref = person.event_ref_list[0]
-    #   TRACE(getframeinfo(currentframe()),type(eref))
-    #   TRACE(getframeinfo(currentframe()),vars(eref))
-    #   TRACE(getframeinfo(currentframe()),eref.get_referenced_handles())
-
-        TRACE(getframeinfo(currentframe()),pperson)
-        for e, erefl in enumerate(person.event_ref_list):
-            print(e,type(erefl),vars(erefl))
-            event = self.database.get_event_from_handle(erefl.get_reference_handle())
-            print('    event',e,':',event.get_type())#type(event),vars(event),event)
-            place_handle = event.get_place_handle()
-            print('            :',place_handle)
-            place = self.database.get_place_from_handle(place_handle)
-            print('            :',place)
-            place_title = place_displayer.display(self.database, place)
-            print('            :',place_title)
-                 
-        #        displayer.display(o.get_date_object())
-            date = event.get_date_object()
-            year = date.get_year()
-        #   print(date,type(date),vars(date))
-        #   print('            :')
-            print('            :',year)
-        #   print('           :',type(year),str(year))
-        #   es = event.get_schema()
-        #   print('           :',es)#['gramps_id'])          
-
-            eid = event.get_gramps_id()
-            print('           :',type(eid),eid)
-
-    #   erefh = eref.get_referenced_handles()[0]
-    #   TRACE(getframeinfo(currentframe()),type(erefh))
-    #   TRACE(getframeinfo(currentframe()),erefh)
-
-
-
-
-     #  --- Now let the party begin! ---
-
         self.doc.start_table(None, 'TCR-Table')
 
-
         self.doc.start_row()
-
         self.doc.start_cell('TCR-HeadCell', 1)
         self.doc.start_paragraph('TCR-Name')
         self.doc.write_text("Year")#, mark)
         self.doc.end_paragraph()
         self.doc.end_cell()
 
-        for c, gid in enumerate(self.gid_list):
+        for gcount, gid in enumerate(self.gid_list):
             self.doc.start_cell('TCR-HeadCell', 1)
             self.doc.start_paragraph('TCR-Name')
             person = self.database.get_person_from_gramps_id(gid)
             pperson = str(_Name_get_styled(person.get_primary_name()))
-                                       # _Name_CALLNAME_DONTUSE))
-
-#  note = '{0} Largest Counties; {1:,} Cases; {2:,} Deaths'.format(nG,tcases,tdeaths)
             self.doc.write_text('{0}\n({1})'.format(pperson,gid))
             self.doc.end_paragraph()
             self.doc.end_cell()
-
         self.doc.end_row()
+
+
+        for yndx, year in enumerate(year_set):
+    #   for yndx in range(0,1):
+    #       year = year_set[yndx]
+            print('Starting row',yndx,'year',year)
+            test_line = str(year)
+
+            self.doc.start_row()
+
+            self.doc.start_cell('TCR-Entries', 1)
+            self.doc.start_paragraph('TCR-Contents')
+            self.doc.write_text(str(year))
+            self.doc.end_paragraph()
+            self.doc.end_cell()
+
+            for pndx, gid in enumerate(self.gid_list):
+        #   for pndx in range(0,1):
+                gid = self.gid_list[pndx]
+                self.doc.start_cell('TCR-Entries', 1)
+
+                person = self.database.get_person_from_gramps_id(gid)
+                pperson = str(_Name_get_styled(person.get_primary_name()))
+                print('    ',gid,pperson,year)
+                
+            #   for erefl in person.event_ref_list:
+                for endx, erefl in enumerate(person.event_ref_list):
+            #   for endx in range (0,1):
+            #       erefl = person.event_ref_list[endx]
+                #   endx = 0
+
+                #   event = self.database.get_event_from_handle(erefl.get_reference_handle())
+                #   print('endx:',endx,type(person.event_ref_list),len(person.event_ref_list))
+                #   print('    ',person.event_ref_list)
+                #   print('    ',person.event_ref_list[endx])
+                #   print()
+     
+                    erefl = person.event_ref_list[endx]
+                    event = self.database.get_event_from_handle(erefl.get_reference_handle())
+                    eid = event.get_gramps_id()
+                    date = event.get_date_object()
+                    eyear = date.get_year()
+                    etype = event.get_type()
+                    place_handle = event.get_place_handle()
+                    place = self.database.get_place_from_handle(place_handle)
+                    place_title = place_displayer.display(self.database, place)
+                    event_text = None
+    
+                    if (eyear == year):
+                        event_text = '{0}; {1}\n{2}'.format(eid,etype,place_title)
+                        print('         ',year,eid,etype,place_title)
+                        self.doc.start_paragraph('TCR-Contents')
+                        self.doc.write_text(event_text)
+                        self.doc.end_paragraph()
+                '''
+                while eyear >= year:
+
+                    if (eyear == year):
+                        event_text = '{0}; {1}\n{2}'.format(eid,etype,place_title)
+                        self.doc.start_paragraph('TCR-Contents')
+                        self.doc.write_text(event_text)
+                        self.doc.end_paragraph()
+
+                    endx = ecount + 1
+          #    print(endx,person.event_ref_list[ecount])
+                    print(endx,len(person.event_ref_list))
+                    print(endx,list(person.event_ref_list)[ecount])
+                    print(endx,person.event_ref_list[ecount])
+                    erefl = person.event_ref_list[endx]
+                    event = self.database.get_event_from_handle(erefl.get_reference_handle())
+                    eid = event.get_gramps_id()
+                    date = event.get_date_object()
+                    eyear = date.get_year()
+                    etype = event.get_type()
+                    place_handle = event.get_place_handle()
+                    place = self.database.get_place_from_handle(place_handle)
+                    place_title = place_displayer.display(self.database, place)
+
+                '''
+
+                if event_text is not None:
+                    test_line = test_line + '  ' + event_text
+                else:
+                    test_line =' '
+
+                self.doc.end_cell()
+
+            print(test_line) 
+
+            self.doc.end_row()
+
 
         self.doc.end_table()
 
@@ -267,7 +334,7 @@ _Name_CALLNAME_REPLACE = 1
 _Name_CALLNAME_UNDERLINE_ADD = 2
 
 
-def _Name_get_styled(name):#, callname, placeholder=False):
+def _Name_get_styled(name):
     return StyledText(displayer.display_name(Name(source=name)))
 
 
@@ -360,20 +427,7 @@ class TimelineContingencyOptions(MenuReportOptions):
         para.set_description(_("The style used for table title"))
         default_style.add_paragraph_style('TCR-Title', para) 
 
-        pnames = default_style.get_paragraph_style_names()
-
-        #Table Styles
-        cell = docgen.TableCellStyle()
-        cell.set_padding(0.1)
-        cell.set_top_border(1)
-        cell.set_left_border(1)
-        cell.set_right_border(1)
-        default_style.add_cell_style('TCR-HeadCell', cell)
-
-   #    TRACE(getframeinfo(currentframe()),default_style)
-   #    pnames = default_style.get_paragraph_style_names()
-   #    TRACE(getframeinfo(currentframe()),pnames)
-
+        
         font = docgen.FontStyle()
         font.set_type_face(docgen.FONT_SANS_SERIF)
         font.set_size(12)
@@ -384,10 +438,35 @@ class TimelineContingencyOptions(MenuReportOptions):
         para.set_description(_("The style used for names"))
         default_style.add_paragraph_style('TCR-Name', para) # *
 
-   #    TRACE(getframeinfo(currentframe()),default_style)
-   #    pnames = default_style.get_paragraph_style_names()
-   #    TRACE(getframeinfo(currentframe()),pnames)
+        font = docgen.FontStyle()
+        font.set_type_face(docgen.FONT_SANS_SERIF)
+        font.set_size(10)
+        para = docgen.ParagraphStyle()
+        para.set_alignment(docgen.PARA_ALIGN_LEFT)
+        para.set_font(font)
+        para.set_description(_("The style used for cell contents"))
+        default_style.add_paragraph_style('TCR-Contents', para) # *
 
+#       pnames = default_style.get_paragraph_style_names()
 
+        #Table Styles
+        cell = docgen.TableCellStyle()
+        cell.set_padding(0.1)
+        cell.set_top_border(1)
+        cell.set_left_border(1)
+        cell.set_right_border(1)
+        default_style.add_cell_style('TCR-HeadCell', cell)
 
+        cell = docgen.TableCellStyle()
+        cell.set_padding(0.1)
+        cell.set_top_border(1)
+        cell.set_bottom_border(1)
+        cell.set_left_border(1)
+        cell.set_right_border(1)
+        default_style.add_cell_style('TCR-Entries', cell)
+
+    #   cell = docgen.TableCellStyle()
+    #   cell.set_padding(0.1)
+    #   cell.set_left_border(1)
+    #   default_style.add_cell_style('TCR-EmptyCell', cell)
 
