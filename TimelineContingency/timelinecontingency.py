@@ -122,16 +122,28 @@ class TimelineContingencyReport(Report):
         """
 
         Report.__init__(self, database, options, user)
-   #    Report.set_table_columns(4)
 
         self.__options = options
+        print('options:')
+        TRACE(getframeinfo(currentframe()),vars(options))
+
+   #    self.__pid_LIST = options.__pid_list
 
         menu = options.menu
+        self.__menu = menu
+        print()
+        print('menu:')
+        TRACE(getframeinfo(currentframe()),vars(menu))
+    #   print()
+    #   self.__pid_list = menu.get_option_by_name('pid_list')
+    #   TRACE(getframeinfo(currentframe()),self.__pid_list)
+
         self.person_id = menu.get_option_by_name('pid').get_value()
-        TRACE(getframeinfo(currentframe()),type(self.person_id)) # I0166 (gid)
-        TRACE(getframeinfo(currentframe()),self.person_id) # I0166 (gid)
-        self.gid_list = self.person_id.split()
-        TRACE(getframeinfo(currentframe()),self.gid_list) # I0166 (gid)
+    #   TRACE(getframeinfo(currentframe()),type(self.person_id)) # I0166 (gid)
+    #   TRACE(getframeinfo(currentframe()),self.person_id) # I0166 (gid)
+
+        self.__gid_list = self.person_id.split()
+    #   TRACE(getframeinfo(currentframe()),self.__gid_list) # I0166 (gid)
 
     #   self.placeholder  = False #menu.get_option_by_name('placeholder').get_value()
     #   self.incl_sources = False #menu.get_option_by_name('incl_sources').get_value()
@@ -171,9 +183,10 @@ class TimelineContingencyReport(Report):
         year_list = []
 
     #   loop through persons of interest 
-        print(len(self.gid_list),'gids:',self.gid_list)
+    #   print(len(self.gid_list),'gids:',self.menu)
+    #   self.__options.set_table_columns(len(self.gid_list))
     
-        for gcount, gid in enumerate(self.gid_list):
+        for gcount, gid in enumerate(self.__gid_list):
             print()
             person = self.database.get_person_from_gramps_id(gid)
             pperson = str(_Name_get_styled(person.get_primary_name()))
@@ -225,7 +238,7 @@ class TimelineContingencyReport(Report):
         self.doc.end_paragraph()
         self.doc.end_cell()
 
-        for gcount, gid in enumerate(self.gid_list):
+        for gcount, gid in enumerate(self.__gid_list):
             self.doc.start_cell('TCR-HeadCell', 1)
             self.doc.start_paragraph('TCR-Name')
             person = self.database.get_person_from_gramps_id(gid)
@@ -250,9 +263,9 @@ class TimelineContingencyReport(Report):
             self.doc.end_paragraph()
             self.doc.end_cell()
 
-            for pndx, gid in enumerate(self.gid_list):
+            for pndx, gid in enumerate(self.__gid_list):
         #   for pndx in range(0,1):
-                gid = self.gid_list[pndx]
+        #       gid = self.pid_list[pndx]
                 self.doc.start_cell('TCR-Entries', 1)
 
                 person = self.database.get_person_from_gramps_id(gid)
@@ -359,6 +372,7 @@ class TimelineContingencyOptions(MenuReportOptions):
         self.__db = dbase
         self.__pid = None
         self.__table = None
+        self.__pid_list = None
         MenuReportOptions.__init__(self, name, dbase)
         HERE(getframeinfo(currentframe()))
         
@@ -366,12 +380,13 @@ class TimelineContingencyOptions(MenuReportOptions):
     def get_subject(self):
         HERE(getframeinfo(currentframe()))
         """ Return a string that describes the subject of the report. """
-        gid = self.__pid.get_value()
         TRACE(getframeinfo(currentframe()),self.__pid)
-        person = self.__db.get_person_from_gramps_id(gid)
-        TRACE(getframeinfo(currentframe()),displayer.display(person))
-        return displayer.display(person)
-
+        gid = self.__pid.get_value()
+        TRACE(getframeinfo(currentframe()),gid)
+        print(type(gid))
+        self.__pid_list = gid.split()
+        TRACE(getframeinfo(currentframe()),self.__pid_list) 
+        print(len(self.__pid_list)) 
 
     def add_menu_options(self, menu):
         HERE(getframeinfo(currentframe()))
@@ -386,11 +401,12 @@ class TimelineContingencyOptions(MenuReportOptions):
             _("Names of people comprising columns of table."))
         menu.add_option(category_name, "pid", self.__pid)
 
+    '''
     def set_table_columns(self,ncol):
         TRACE(getframeinfo(currentframe()),ncol)
-        table = docgen.TableStyle(ncol)
+        table = docgen.TableStyle()
         table.set_width(100)
-        table.set_columns(ncol)
+        table.set_columns(ncol+1)
         w0 = 8
         table.set_column_width(0, w0)
         w = (100-w0)/(ncol-1)
@@ -398,19 +414,28 @@ class TimelineContingencyOptions(MenuReportOptions):
             print('column',c)
             table.set_column_width(c, w)
 
-        default_style.add_table_style('FSR-Table', table)
+        TRACE(getframeinfo(currentframe()),ncol)
+
+        default_style = self.__menu.get_default_style()
+        TRACE(getframeinfo(currentframe()),ncol)
+
+        default_style.add_table_style('TCR-Table', table)
+        TRACE(getframeinfo(currentframe()),ncol)
+    '''
 
     def make_default_style(self, default_style):
-        HERE(getframeinfo(currentframe()))
+        self.get_subject()
         """Make default output style for the Family Sheet Report."""
         #Paragraph Styles
         table = docgen.TableStyle()
         table.set_width(100)
-        table.set_columns(4)
+        TRACE(getframeinfo(currentframe()),len(self.__pid_list)) 
+        table.set_columns(len(self.__pid_list)+1) 
         w0 = 8
         table.set_column_width(0, w0)
-        w = (100-w0)/3
-        for c in range(1,4):
+        w = (100-w0)/len(self.__pid_list) 
+
+        for c in range(1,len(self.__pid_list)+1):
             print('column',c)
             table.set_column_width(c, w)
 
