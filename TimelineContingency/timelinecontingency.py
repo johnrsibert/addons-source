@@ -171,8 +171,20 @@ class TimelineContingencyReport(Report):
 
     def get_place(self,event):
         place_handle = event.get_place_handle()
-        place = self.database.get_place_from_handle(place_handle)
-        place_title = place_displayer.display(self.database, place)
+    #   TRACE(getframeinfo(currentframe()),place_handle)
+        '''
+        if place_handle != '': #is not None:
+            place = self.database.get_place_from_handle(place_handle)
+            place_title = place_displayer.display(self.database, place)
+        else:
+            place_title = None
+        '''
+        try:
+            place = self.database.get_place_from_handle(place_handle)
+            place_title = place_displayer.display(self.database, place)
+        except:
+            place_title = None
+
         return(place_title)
 
 
@@ -198,9 +210,10 @@ class TimelineContingencyReport(Report):
                 eid = event.get_gramps_id()
                 date = event.get_date_object()
                 year = date.get_year()
-                place_handle = event.get_place_handle()
-                place = self.database.get_place_from_handle(place_handle)
-                place_title = place_displayer.display(self.database, place)
+            #   place_handle = event.get_place_handle()
+            #   place = self.database.get_place_from_handle(place_handle)
+            #   place_title = place_displayer.display(self.database, place)
+                place_title = self.get_place(event)
                 year_list.append(int(year))
 
                 print('endx:',endx,type(erefl),erefl.ref)
@@ -290,9 +303,10 @@ class TimelineContingencyReport(Report):
                     date = event.get_date_object()
                     eyear = date.get_year()
                     etype = event.get_type()
-                    place_handle = event.get_place_handle()
-                    place = self.database.get_place_from_handle(place_handle)
-                    place_title = place_displayer.display(self.database, place)
+                #   place_handle = event.get_place_handle()
+                #   place = self.database.get_place_from_handle(place_handle)
+                #   place_title = place_displayer.display(self.database, place)
+                    place_title = self.get_place(event)
                     event_text = None
     
                     if (eyear == year):
