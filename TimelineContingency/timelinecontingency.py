@@ -182,8 +182,23 @@ class TimelineContingencyReport(Report):
         try:
             place = self.database.get_place_from_handle(place_handle)
             place_title = place_displayer.display(self.database, place)
-        except:
-            place_title = None
+        except Exception as ex:
+        #   print(ex)
+        #   print(repr(ex))
+        #   print(ex.args)
+            place_title = 'Unspecified location.'
+
+        '''
+        except Exception as e: # (as opposed to except Exception, e:)
+                           # ^ that will just look for two classes, Exception and e
+        # for the repr
+        print(repr(e))
+        # for just the message, or str(e), since print calls str under the hood
+        print(e)
+        # the arguments that the exception has been called with. 
+        # the first one is usually the message. (OSError is different, though)
+        print(e.args)
+        '''
 
         return(place_title)
 
@@ -438,19 +453,22 @@ class TimelineContingencyOptions(MenuReportOptions):
     '''
 
     def make_default_style(self, default_style):
+        '''Make default styles for Timeline Contingency Report'''
         self.get_subject()
-        """Make default output style for the Family Sheet Report."""
-        #Paragraph Styles
-        table = docgen.TableStyle()
-        table.set_width(100)
-        TRACE(getframeinfo(currentframe()),len(self.__pid_list)) 
-        table.set_columns(len(self.__pid_list)+1) 
-        w0 = 8
-        table.set_column_width(0, w0)
-        w = (100-w0)/len(self.__pid_list) 
 
-        for c in range(1,len(self.__pid_list)+1):
-            print('column',c)
+        table = docgen.TableStyle()
+        table.set_width(100.0)
+        TRACE(getframeinfo(currentframe()),len(self.__pid_list)) 
+        npid = len(self.__pid_list) 
+        table.set_columns(npid+1)
+        w0 = 7.0
+        print('column 0 width =',w0)
+        table.set_column_width(0, w0)
+        w = (100.0-w0)/npid
+
+        for p in range(0,npid):
+            c = p+1
+            print('column',c,'width =',w)
             table.set_column_width(c, w)
 
         default_style.add_table_style('TCR-Table', table)
