@@ -62,8 +62,6 @@ try:
 except ValueError:
     _trans = glocale.translation
 _ = _trans.gettext
-#from gramps.gen.simple._simpleaccess import SimpleAccess
-
 
 
 #------------------------------------------------------------------------
@@ -72,7 +70,7 @@ _ = _trans.gettext
 #
 #------------------------------------------------------------------------
 class TimelineContingencyReport(Report):
-    """
+    '''
     A Family Sheet is a page which contains all available info about a specific
     person, the families this person is a father or mother in, and the children
     of these families.
@@ -97,7 +95,7 @@ class TimelineContingencyReport(Report):
 
     If recursive printing is selected, each Family Sheet is followed by the
     Family Sheets of the children that had spouses.
-    """
+    '''
 
     def __init__(self, database, options, user):
         """
@@ -189,7 +187,7 @@ class TimelineContingencyReport(Report):
             self.doc.start_row()
 
             self.doc.start_cell('TCR-Entries', 1)
-            self.doc.start_paragraph('TCR-Contents')
+            self.doc.start_paragraph('TCR-Row-Head')
             self.doc.write_text(str(year))
             self.doc.end_paragraph()
             self.doc.end_cell()
@@ -296,22 +294,31 @@ class TimelineContingencyOptions(MenuReportOptions):
         para.set_description(_("The style used for cell contents"))
         default_style.add_paragraph_style('TCR-Contents', para) # *
 
+        font = docgen.FontStyle()
+        font.set_type_face(docgen.FONT_SANS_SERIF)
+        font.set_size(10)
+        para = docgen.ParagraphStyle()
+        para.set_alignment(docgen.PARA_ALIGN_CENTER)
+        para.set_font(font)
+        para.set_description(_("The style used for cell contents"))
+        default_style.add_paragraph_style('TCR-Row-Head', para) # *
+
         #Table Styles
 
         table = docgen.TableStyle()
         table.set_width(100.0)
-        print(self.__pid_list) 
+    #   print(self.__pid_list) 
         npid = len(self.__pid_list) 
-        print(npid)
+    #   print(npid)
         table.set_columns(npid+1)
-        w0 = 7.0
-        print('column 0 width =',w0)
+        w0 = 6.0
+    #   print('column 0 width =',w0)
         table.set_column_width(0, w0)
         w = (100.0-w0)/npid
 
         for p in range(0,npid):
             c = p+1
-            print('column',c,'width =',w)
+    #       print('column',c,'width =',w)
             table.set_column_width(c, w)
 
         default_style.add_table_style('TCR-Table', table)
