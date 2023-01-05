@@ -71,30 +71,19 @@ _ = _trans.gettext
 #------------------------------------------------------------------------
 class TimelineContingencyReport(Report):
     '''
-    A Family Sheet is a page which contains all available info about a specific
-    person, the families this person is a father or mother in, and the children
-    of these families.
+    A Timeline Contingency Report is a table where the columns are selected
+    People of Interest, and the columns are years when events have been
+    recorded for the selected people.
 
-    The intended use for this report is to get a full dump of the database in
-    nice paper form in a way suitable to file it in a folder.
+    The intended uses are to show the associations in space of time of people
+    will eventually form family and to demonstrate subsequent dispersal of 
+    family members.
 
-    Each Family Sheet contains a key at the top right which is derived from the
-    relationship from the central person in the database and the person for
-    which the sheet is printed. For direct ascendants, the Family Sheet key is
-    the "Ahnentafel" number (also known as Eytzinger, Sosa, Sosa-Stradonitz, or
-    Kekule number). Each child is assigned a letter starting from "a", and the
-    Family Sheet key of the child is the Family Sheet key of the parent with
-    the child's letter appended.
+    Other uses are to help identify missing or erroneous information.
 
-    The report contains full information (including all events, attributes,
-    source references, and notes) for the key person and all its spouses.
-    For children that had spouses, only a short section (including only name
-    and birth event info) is printed along with a reference to the Family Sheet
-    page on which this child would be the key person, while for children that
-    had no spouses, full info is printed.
-
-    If recursive printing is selected, each Family Sheet is followed by the
-    Family Sheets of the children that had spouses.
+    Potential improvements:
+        - shorten place description by restrictin levels in the place hierarchy
+        - restrict page breaks to follow a row to prevent breaks withn a cell or row
     '''
 
     def __init__(self, database, options, user):
@@ -307,18 +296,14 @@ class TimelineContingencyOptions(MenuReportOptions):
 
         table = docgen.TableStyle()
         table.set_width(100.0)
-    #   print(self.__pid_list) 
         npid = len(self.__pid_list) 
-    #   print(npid)
         table.set_columns(npid+1)
         w0 = 6.0
-    #   print('column 0 width =',w0)
         table.set_column_width(0, w0)
         w = (100.0-w0)/npid
 
         for p in range(0,npid):
             c = p+1
-    #       print('column',c,'width =',w)
             table.set_column_width(c, w)
 
         default_style.add_table_style('TCR-Table', table)
