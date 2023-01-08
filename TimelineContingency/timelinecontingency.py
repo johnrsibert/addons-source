@@ -72,7 +72,7 @@ _ = _trans.gettext
 class TimelineContingencyReport(Report):
     '''
     A Timeline Contingency Report is a table where the columns are selected
-    People of Interest, and the columns are years when events have been
+    People of Interest, and the rows are the years when events have been
     recorded for the selected people.
 
     The intended uses are to show the associations in space of time of people
@@ -215,6 +215,7 @@ class TimelineContingencyReport(Report):
 
 
             self.doc.end_row()
+        #   self.doc.page_break() # seem to have no effect; calls absstract method
 
         self.doc.end_table()
 
@@ -230,9 +231,9 @@ def _Name_get_styled(name):
 class TimelineContingencyOptions(MenuReportOptions):
     def __init__(self, name, dbase):
         self.__db = dbase
-        self.__pid = None
+        self.__pid = 'I0001' #None
         self.__table = None
-        self.__pid_list = None
+        self.__pid_list = ['I0001'] #None
         MenuReportOptions.__init__(self, name, dbase)
         
 
@@ -300,11 +301,14 @@ class TimelineContingencyOptions(MenuReportOptions):
         table.set_columns(npid+1)
         w0 = 6.0
         table.set_column_width(0, w0)
-        w = (100.0-w0)/npid
+        if npid > 0:
+            w = (100.0-w0)/npid
+            for p in range(0,npid):
+                c = p+1
+                table.set_column_width(c, w)
+        else:
+            table.set_column_width(1, (100.0-w0))
 
-        for p in range(0,npid):
-            c = p+1
-            table.set_column_width(c, w)
 
         default_style.add_table_style('TCR-Table', table)
         self.__table = table
