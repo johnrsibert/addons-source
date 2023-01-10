@@ -138,16 +138,16 @@ class TimelineContingencyReport(Report):
                 year_list.append(int(year))
 
         place = None
-
    
         year_set = set(year_list)
         year_set = sorted(year_set)
 
 
         self.doc.start_paragraph('TCR-Title')
-        self.doc.write_text('Timeline Contingeny Table')
+        self.doc.write_text('Timeline Contingeny Table\n')
         self.doc.end_paragraph()
 
+    #   Make each row a separate table    
         self.doc.start_table(None, 'TCR-Table')
 
         # write column headings
@@ -168,10 +168,12 @@ class TimelineContingencyReport(Report):
             self.doc.end_cell()
         self.doc.end_row()
 
+        self.doc.end_table()
 
         # loop through year_set starting a new row for each year
         for yndx, year in enumerate(year_set):
-            test_line = str(year)
+
+            self.doc.start_table(None, 'TCR-Table')
 
             self.doc.start_row()
 
@@ -206,18 +208,11 @@ class TimelineContingencyReport(Report):
                         self.doc.write_text(event_text)
                         self.doc.end_paragraph()
 
-                if event_text is not None:
-                    test_line = test_line + '  ' + event_text
-                else:
-                    test_line =' '
-
                 self.doc.end_cell()
 
-
             self.doc.end_row()
-        #   self.doc.page_break() # seem to have no effect; calls absstract method
 
-        self.doc.end_table()
+            self.doc.end_table()
 
 
 def _Name_get_styled(name):
@@ -231,9 +226,9 @@ def _Name_get_styled(name):
 class TimelineContingencyOptions(MenuReportOptions):
     def __init__(self, name, dbase):
         self.__db = dbase
-        self.__pid = 'I0001' #None
+        self.__pid = 'I0001'
         self.__table = None
-        self.__pid_list = ['I0001'] #None
+        self.__pid_list = ['I0001']
         MenuReportOptions.__init__(self, name, dbase)
         
 
@@ -273,7 +268,7 @@ class TimelineContingencyOptions(MenuReportOptions):
         para.set_alignment(docgen.PARA_ALIGN_CENTER)
         para.set_font(font)
         para.set_description(_("The style used for names"))
-        default_style.add_paragraph_style('TCR-Name', para) # *
+        default_style.add_paragraph_style('TCR-Name', para)
 
         font = docgen.FontStyle()
         font.set_type_face(docgen.FONT_SANS_SERIF)
@@ -282,7 +277,7 @@ class TimelineContingencyOptions(MenuReportOptions):
         para.set_alignment(docgen.PARA_ALIGN_LEFT)
         para.set_font(font)
         para.set_description(_("The style used for cell contents"))
-        default_style.add_paragraph_style('TCR-Contents', para) # *
+        default_style.add_paragraph_style('TCR-Contents', para)
 
         font = docgen.FontStyle()
         font.set_type_face(docgen.FONT_SANS_SERIF)
@@ -291,7 +286,7 @@ class TimelineContingencyOptions(MenuReportOptions):
         para.set_alignment(docgen.PARA_ALIGN_CENTER)
         para.set_font(font)
         para.set_description(_("The style used for cell contents"))
-        default_style.add_paragraph_style('TCR-Row-Head', para) # *
+        default_style.add_paragraph_style('TCR-Row-Head', para)
 
         #Table Styles
 
@@ -299,25 +294,13 @@ class TimelineContingencyOptions(MenuReportOptions):
         table.set_width(100.0)
         npid = len(self.__pid_list) 
         table.set_columns(npid+1)
-        w0 = 6.0
+        w0 = 7.0
         table.set_column_width(0, w0)
-#    table.set_column_width(0, w0)
-#    npid = npid if npid else 1  # only adding this line solves the ZeroDivisionError.
-#    w = (100.0-w0)/np
+    #   Thanks to Serge Noiraud via The Gramps Project for this solution to vivide by 0 issue 
         npid = npid if npid else 1
         w = (100.0-w0)/npid
         for p in range(0,npid):
-        #   c = p+1
             table.set_column_width(p+1, w)
-        '''
-        if npid > 0:
-            w = (100.0-w0)/npid
-            for p in range(0,npid):
-                c = p+1
-                table.set_column_width(c, w)
-        else:
-            table.set_column_width(1, (100.0-w0))
-        '''
 
         default_style.add_table_style('TCR-Table', table)
         self.__table = table
