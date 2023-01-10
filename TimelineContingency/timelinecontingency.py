@@ -301,6 +301,15 @@ class TimelineContingencyOptions(MenuReportOptions):
         table.set_columns(npid+1)
         w0 = 6.0
         table.set_column_width(0, w0)
+#    table.set_column_width(0, w0)
+#    npid = npid if npid else 1  # only adding this line solves the ZeroDivisionError.
+#    w = (100.0-w0)/np
+        npid = npid if npid else 1
+        w = (100.0-w0)/npid
+        for p in range(0,npid):
+        #   c = p+1
+            table.set_column_width(p+1, w)
+        '''
         if npid > 0:
             w = (100.0-w0)/npid
             for p in range(0,npid):
@@ -308,7 +317,7 @@ class TimelineContingencyOptions(MenuReportOptions):
                 table.set_column_width(c, w)
         else:
             table.set_column_width(1, (100.0-w0))
-
+        '''
 
         default_style.add_table_style('TCR-Table', table)
         self.__table = table
